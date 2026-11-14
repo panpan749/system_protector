@@ -15,11 +15,12 @@ concurrency:
 
 jobs:
   release:
+    if: github.ref == 'refs/heads/main'
     runs-on: windows-2022
     timeout-minutes: 15
     env:
       RELEASE_TAG: v0.5.1
-      SOURCE_COMMIT: 76289ea553b6d9a7ff34c2b68dd6ff2a2c9d0072
+      SOURCE_COMMIT: ${{ github.sha }}
       GH_REPO: ${{ github.repository }}
     defaults:
       run:
@@ -28,7 +29,7 @@ jobs:
       - name: Check out reviewed source
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: 76289ea553b6d9a7ff34c2b68dd6ff2a2c9d0072
+          ref: ${{ github.sha }}
           persist-credentials: false
 
       - name: Build Windows executables
@@ -90,9 +91,12 @@ jobs:
 
           本包由 GitHub Actions 从下方源码提交编译，维护回归检查通过后发布。附件提供 ZIP 的 SHA-256 校验文件，包内另附各 EXE 的校验值。发布包不含个人截图、历史记录或清理备份。
 
-          源码提交：`76289ea553b6d9a7ff34c2b68dd6ff2a2c9d0072`。
+          源码提交：`RELEASE_SOURCE_COMMIT`。
           '@
+          $notes = $notes.Replace('RELEASE_SOURCE_COMMIT', $env:SOURCE_COMMIT)
           Set-Content release-notes.md -Value $notes -Encoding utf8
+          $head = gh api "repos/$env:GH_REPO/branches/main" --jq '.commit.sha'
+          if ($LASTEXITCODE -ne 0 -or $head -ne $env:SOURCE_COMMIT) { throw 'Branch head changed during build; review before publishing.' }
           $raw = gh release view $env:RELEASE_TAG --json databaseId,isDraft,targetCommitish 2>$null
           if ($LASTEXITCODE -eq 0) {
             $existing = $raw | ConvertFrom-Json
