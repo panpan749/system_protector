@@ -8,7 +8,21 @@ $vs=& $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.
 if(!$vs) { throw 'Visual C++ Build Tools are required for window capture.' }
 $msvc=Get-ChildItem -LiteralPath (Join-Path $vs 'VC\Tools\MSVC') -Directory | Sort-Object Name -Descending | Select-Object -First 1
 $sdkRoot=Join-Path ${env:ProgramFiles(x86)} 'Windows Kits\10'
-$sdk=Get-ChildItem -LiteralPath (Join-Path $sdkRoot 'Include') -Directory | Sort-Object Name -Descending | Select-Object -First 1
+$sdk=Get-ChildItem -LiteralPath (Join-Path $sdkRoot 'Include') -Directory | Where-Object {
+    $sdkCandidate=$_
+    if($sdkCandidate.Name -notmatch '^\d+\.\d+\.\d+\.\d+$') { return $false }
+    if([version]$sdkCandidate.Name -lt [version]'10.0.18362.0') { return $false }
+    $requiredHeaders=@('um\windows.h','ucrt\stdio.h','shared\sdkddkver.h','um\windows.graphics.capture.interop.h','cppwinrt\winrt\Windows.Graphics.Capture.h')
+    foreach($header in $requiredHeaders) {
+        if(!(Test-Path -LiteralPath (Join-Path $sdkCandidate.FullName $header) -PathType Leaf)) { return $false }
+    }
+    foreach($library in @('um\x64\windowsapp.lib','ucrt\x64\libucrt.lib')) {
+        if(!(Test-Path -LiteralPath (Join-Path $sdkRoot ('Lib\'+$sdkCandidate.Name+'\'+$library)) -PathType Leaf)) { return $false }
+    }
+    return $true
+} | Sort-Object { [version]$_.Name } -Descending | Select-Object -First 1
+if(!$sdk) { throw 'A complete Windows SDK 10.0.18362.0 or newer with C++/WinRT headers and x64 libraries is required.' }
+Write-Output ('Windows SDK: '+$sdk.Name)
 $captureIncludes=@((Join-Path $msvc.FullName 'include'))+@('ucrt','shared','um','winrt','cppwinrt' | ForEach-Object { Join-Path $sdk.FullName $_ })
 $captureLibraries=@((Join-Path $msvc.FullName 'lib\x64'))+@('ucrt','um' | ForEach-Object { Join-Path $sdkRoot ('Lib\'+$sdk.Name+'\'+$_+'\x64') })
 $compiler=Join-Path $msvc.FullName 'bin\Hostx64\x64\cl.exe'
@@ -18,3 +32,4 @@ $link=@('/link')+@($captureLibraries | ForEach-Object { '/LIBPATH:'+$_ })+@('win
 if($LASTEXITCODE -ne 0) { throw 'Window capture compilation failed.' }
 & $compiler @options (Join-Path $projectDir 'native\CaptureFixture.cpp') ('/Fo'+(Join-Path $outputDir 'CaptureFixture.obj')) ('/Fe'+(Join-Path $outputDir 'PopupGuard.GpuFixture.exe')) @link dcomp.lib d2d1.lib dwrite.lib
 if($LASTEXITCODE -ne 0) { throw 'GPU capture fixture compilation failed.' }
+
