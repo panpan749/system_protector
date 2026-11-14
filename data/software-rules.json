@@ -1,0 +1,152 @@
+{
+  "SchemaVersion": 1,
+  "Revision": 1,
+  "Rules": [
+    {
+      "Revision": 1,
+      "Kind": "Component",
+      "Category": "广告／推广组件",
+      "Reason": "本机人工核对过的组件；命中只说明身份特征相符，清理须用户确认。",
+      "Source": "https://browser.360.cn/se/help/faq-detail_360hbpb_360hbpb.html",
+      "InstallId": "",
+      "Publisher": "360",
+      "ProductName": "360",
+      "ExtensionId": "",
+      "Id": "component.360huabao",
+      "Name": "360 画报／360 壁纸",
+      "Base": "Roaming",
+      "RelativeRoot": "360huabao",
+      "Markers": [
+        "360huabao.exe"
+      ]
+    },
+    {
+      "Revision": 1,
+      "Kind": "Component",
+      "Category": "历史存在木马组件",
+      "Reason": "2026-11-13 本机同目录的 kernel_utility_driver32.sys 被 Defender 检出 Rootkit；当前命中不等于再次判毒。",
+      "Source": "本机核查 2026-11-13",
+      "InstallId": "{6967f898-3bdd-4fee-ba68-e7b5f5ee9382}}_is1",
+      "Publisher": "天津中思明达科技有限公司",
+      "ProductName": "QuickFolder",
+      "ExtensionId": "",
+      "Id": "component.quickfolder",
+      "Name": "QuickFolder",
+      "Base": "ProgramFilesX86",
+      "RelativeRoot": "QuickFolder",
+      "Markers": [
+        "quickfolder_service.exe",
+        "quickfolder_svr.dll",
+        "infra\\Common64.dll"
+      ]
+    },
+    {
+      "Revision": 1,
+      "Kind": "Component",
+      "Category": "历史存在木马组件",
+      "Reason": "2026-11-13 本机同目录的 kernel_utility_driver32.sys 被 Defender 检出 Rootkit；当前命中不等于再次判毒。",
+      "Source": "本机核查 2026-11-13",
+      "InstallId": "{960983B3-2C0D-48F8-95BB-EA029AFD1342}}_is1",
+      "Publisher": "武汉诺沃网络科技有限公司",
+      "ProductName": "WinBoost",
+      "ExtensionId": "",
+      "Id": "component.winboost",
+      "Name": "WinBoost",
+      "Base": "ProgramFilesX86",
+      "RelativeRoot": "WinBoost",
+      "Markers": [
+        "winboost_service.exe",
+        "winboost_svr.dll",
+        "pack\\Services64.dll"
+      ]
+    },
+    {
+      "Revision": 1,
+      "Kind": "Component",
+      "Category": "历史存在木马组件",
+      "Reason": "本机同目录驱动有 Defender Rootkit 检出记录；只针对该目录组件，不匹配其他同名软件。",
+      "Source": "https://huorong.cn/document/tech/vir_report/2013",
+      "InstallId": "Vaultify",
+      "Publisher": "天津邦兴利达科技有限公司",
+      "ProductName": "Vaultify",
+      "ExtensionId": "",
+      "Id": "component.vaultify",
+      "Name": "Vaultify（天津邦兴利达组件）",
+      "Base": "Roaming",
+      "RelativeRoot": "Vaultify",
+      "Markers": [
+        "vaultify_service.exe",
+        "vaultify_svr.dll"
+      ]
+    },
+    {
+      "Revision": 1,
+      "Kind": "Component",
+      "Category": "广告／推广组件",
+      "Reason": "本机人工核对过的组件；命中只说明身份特征相符，清理须用户确认。",
+      "Source": "本机核查 2026-11-13",
+      "InstallId": "keytask_keytaskpop_bzbz0807",
+      "Publisher": "天津六六游科技有限公司",
+      "ProductName": "百战霸主",
+      "ExtensionId": "",
+      "Id": "component.keytask-bzbz",
+      "Name": "百战霸主推广组件",
+      "Base": "Roaming",
+      "RelativeRoot": "keytask",
+      "Markers": [
+        "keytaskpop_bzbz0807"
+      ]
+    },
+    {
+      "Revision": 1,
+      "Kind": "Component",
+      "Category": "广告／推广组件",
+      "Reason": "本机人工核对过的组件；命中只说明身份特征相符，清理须用户确认。",
+      "Source": "本机核查 2026-11-13",
+      "InstallId": "",
+      "Publisher": "成都奇鲁科技有限公司",
+      "ProductName": "大师壁纸",
+      "ExtensionId": "",
+      "Id": "component.masterwallpaper",
+      "Name": "大师壁纸",
+      "Base": "Local",
+      "RelativeRoot": "masterwallpaper\\masterwallpaper",
+      "Markers": [
+        "masterwallpaper.exe",
+        "1.0.244.0\\xhqcnethelp64.dll"
+      ]
+    },
+    {
+      "Revision": 1,
+      "Kind": "ChromeExtension",
+      "Category": "广告／推广组件",
+      "Reason": "本机检查发现新标签页替换和推广逻辑；按精确扩展 ID 匹配。",
+      "Source": "本机核查 2026-11-13",
+      "InstallId": "",
+      "Publisher": "",
+      "ProductName": "",
+      "ExtensionId": "cfpedblmbakdamfceochcemgphgebnkf",
+      "Id": "chrome.zenithstart",
+      "Name": "ZenithStart",
+      "Base": "",
+      "RelativeRoot": "",
+      "Markers": []
+    },
+    {
+      "Revision": 1,
+      "Kind": "ChromeExtension",
+      "Category": "广告／推广组件",
+      "Reason": "本机检查发现新标签页替换和推广逻辑；按精确扩展 ID 匹配。",
+      "Source": "本机核查 2026-11-13",
+      "InstallId": "",
+      "Publisher": "",
+      "ProductName": "",
+      "ExtensionId": "ndnibnapfmcjeomefllboaahbngildga",
+      "Id": "chrome.daybreak",
+      "Name": "DayBreak Tab",
+      "Base": "",
+      "RelativeRoot": "",
+      "Markers": []
+    }
+  ]
+}

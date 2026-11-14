@@ -1,0 +1,56 @@
+[
+  {
+    "Id": "360-news", "Name": "360 卫士推广资讯", "Family": "360",
+    "ProcessNames": ["360tray.exe", "360safe.exe"], "PathSegments": ["360Safe", "360安全卫士"],
+    "TitleExact": ["卫士精选", "今日趣看", "焦点资讯", "轻松一下", "360今日精选"], "TitlePrefixes": ["卫士精选 - ", "今日趣看 - "],
+    "SourceUrl": "https://bbs.360.cn/thread-15889638-1-1.html"
+  },
+  {
+    "Id": "360-wallpaper-promo", "Name": "360 画报 / 壁纸推广", "Family": "360",
+    "ProcessNames": ["360huabao.exe"], "PathSegments": ["360huabao", "360wallpaper", "360壁纸"],
+    "TitleExact": ["360画报推荐", "360壁纸推荐", "今日热点", "热点资讯", "精选推荐", "限时福利", "领红包"], "TitlePrefixes": ["360画报推广", "360壁纸推广", "360壁纸限时福利"],
+    "SourceUrl": "https://bbs.360.cn/thread-16008209-1-1.html"
+  },
+  {
+    "Id": "2345-haozip-helper", "Name": "2345 好压推广助手", "Family": "2345",
+    "ProcessNames": ["Helper_Haozip.exe"], "PathSegments": ["2345Soft", "HaoZip", "2345好压", "Helper_2345"],
+    "TitleExact": ["今日热点", "热点资讯", "2345资讯", "2345精选", "领红包", "限时福利", "双11狂欢"], "TitlePrefixes": ["2345精选 - ", "2345推广"],
+    "SourceUrl": "https://www.huorong.cn/document/tech/vir_report/723"
+  },
+  {
+    "Id": "wps-promotion", "Name": "WPS 热点 / 会员推广", "Family": "WPS",
+    "ProcessNames": ["wpsnotify.exe", "ksetopupmgr.exe"], "PathSegments": ["Kingsoft", "WPS Office", "WPSOffice"],
+    "TitleExact": ["WPS热点", "WPS 热点", "WPS推荐", "WPS会员特惠", "WPS会员限时优惠"], "TitlePrefixes": ["WPS热点 - ", "WPS会员特惠 - "],
+    "SourceUrl": "https://www.huorong.cn/document/tech/safety-classroom/1725"
+  },
+  {
+    "Id": "flash-mini", "Name": "Flash 中心迷你资讯", "Family": "Flash 中心",
+    "ProcessNames": ["MiniPage.exe"], "PathSegments": ["FlashCenter", "Flash Center", "Flash中心"],
+    "TitleExact": ["迷你首页", "今日热点", "热点资讯", "Flash精选", "Flash中心推荐"], "TitlePrefixes": ["Flash精选 - "],
+    "SourceUrl": "https://github.com/lmg325586/PopKiller/blob/master/community_rules.json"
+  },
+  {
+    "Id": "flash-promotion", "Name": "Flash 中心推广组件", "Family": "Flash 中心",
+    "ProcessNames": ["FlashCenter.exe", "FlashHelperService.exe"], "PathSegments": ["FlashCenter", "Flash Center", "Flash中心"],
+    "TitleExact": ["迷你首页", "今日热点", "热点资讯", "Flash精选", "Flash中心推荐", "领红包"], "TitlePrefixes": ["Flash中心推广", "Flash中心限时福利"],
+    "SourceUrl": "https://github.com/lmg325586/PopKiller/blob/master/community_rules.json"
+  },
+  {
+    "Id": "ludashi-news", "Name": "鲁大师迷你新闻", "Family": "鲁大师",
+    "ProcessNames": ["MiniNews.exe"], "PathSegments": ["LuDaShi", "Ludashi", "鲁大师"],
+    "TitleExact": ["迷你新闻页", "迷你新闻", "今日热点", "鲁大师资讯", "鲁大师今日精选"], "TitlePrefixes": ["鲁大师资讯 - "],
+    "SourceUrl": "https://threatinfo.net/companies/ludashi.com"
+  },
+  {
+    "Id": "kuaizip-promotion", "Name": "快压推广组件", "Family": "快压",
+    "ProcessNames": ["KuaizipUpdate.exe"], "PathSegments": ["KuaiZip", "快压", "KuaiZipUpdate"],
+    "TitleExact": ["今日热点", "热点资讯", "快压推荐", "限时福利", "领红包"], "TitlePrefixes": ["快压推广", "快压限时福利"],
+    "SourceUrl": "https://huorong.cn/document/tech/vir_report/1669"
+  },
+  {
+    "Id": "sogou-classic-promotion", "Name": "搜狗推广助手（独立窗口）", "Family": "搜狗输入法",
+    "ProcessNames": ["biz_helper.exe"], "PathSegments": ["SogouInput", "SogouPY", "搜狗拼音输入法"],
+    "TitleExact": ["搜狗推荐", "搜狗精选", "今日热点", "热点资讯", "限时福利", "领红包"], "TitlePrefixes": ["搜狗推广", "搜狗限时福利"],
+    "SourceUrl": "https://www.huorong.cn/document/tech/vir_report/1845"
+  }
+]
