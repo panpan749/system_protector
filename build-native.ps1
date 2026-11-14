@@ -19,6 +19,9 @@ $sdk=Get-ChildItem -LiteralPath (Join-Path $sdkRoot 'Include') -Directory | Wher
     foreach($library in @('um\x64\windowsapp.lib','ucrt\x64\libucrt.lib')) {
         if(!(Test-Path -LiteralPath (Join-Path $sdkRoot ('Lib\'+$sdkCandidate.Name+'\'+$library)) -PathType Leaf)) { return $false }
     }
+    foreach($tool in @('mt.exe','rc.exe')) {
+        if(!(Test-Path -LiteralPath (Join-Path $sdkRoot ('bin\'+$sdkCandidate.Name+'\x64\'+$tool)) -PathType Leaf)) { return $false }
+    }
     return $true
 } | Sort-Object { [version]$_.Name } -Descending | Select-Object -First 1
 if(!$sdk) { throw 'A complete Windows SDK 10.0.18362.0 or newer with C++/WinRT headers and x64 libraries is required.' }
@@ -28,8 +31,13 @@ $captureLibraries=@((Join-Path $msvc.FullName 'lib\x64'))+@('ucrt','um' | ForEac
 $compiler=Join-Path $msvc.FullName 'bin\Hostx64\x64\cl.exe'
 $options=@('/nologo','/std:c++17','/EHsc','/O2','/MT','/W4','/utf-8','/DUNICODE','/D_UNICODE')+@($captureIncludes | ForEach-Object { '/I'+$_ })
 $link=@('/link')+@($captureLibraries | ForEach-Object { '/LIBPATH:'+$_ })+@('windowsapp.lib','d3d11.lib','dxgi.lib','windowscodecs.lib','ole32.lib','user32.lib','dwmapi.lib','wtsapi32.lib','/SUBSYSTEM:WINDOWS','/ENTRY:wmainCRTStartup','/MANIFEST:EMBED',('/MANIFESTINPUT:'+(Join-Path $projectDir 'app.manifest')))
-& $compiler @options (Join-Path $projectDir 'native\WindowCapture.cpp') ('/Fo'+(Join-Path $outputDir 'WindowCapture.obj')) ('/Fe'+(Join-Path $outputDir 'PopupGuard.Capture.exe')) @link
-if($LASTEXITCODE -ne 0) { throw 'Window capture compilation failed.' }
-& $compiler @options (Join-Path $projectDir 'native\CaptureFixture.cpp') ('/Fo'+(Join-Path $outputDir 'CaptureFixture.obj')) ('/Fe'+(Join-Path $outputDir 'PopupGuard.GpuFixture.exe')) @link dcomp.lib d2d1.lib dwrite.lib
-if($LASTEXITCODE -ne 0) { throw 'GPU capture fixture compilation failed.' }
+$originalBuildPath=$env:PATH
+try {
+    $sdkTools=Join-Path $sdkRoot ('bin\'+$sdk.Name+'\x64')
+    $env:PATH=(Split-Path -Parent $compiler)+';'+$sdkTools+';'+$originalBuildPath
+    & $compiler @options (Join-Path $projectDir 'native\WindowCapture.cpp') ('/Fo'+(Join-Path $outputDir 'WindowCapture.obj')) ('/Fe'+(Join-Path $outputDir 'PopupGuard.Capture.exe')) @link
+    if($LASTEXITCODE -ne 0) { throw 'Window capture compilation failed.' }
+    & $compiler @options (Join-Path $projectDir 'native\CaptureFixture.cpp') ('/Fo'+(Join-Path $outputDir 'CaptureFixture.obj')) ('/Fe'+(Join-Path $outputDir 'PopupGuard.GpuFixture.exe')) @link dcomp.lib d2d1.lib dwrite.lib
+    if($LASTEXITCODE -ne 0) { throw 'GPU capture fixture compilation failed.' }
+} finally { $env:PATH=$originalBuildPath }
 
