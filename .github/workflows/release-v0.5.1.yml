@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 15
     env:
       RELEASE_TAG: v0.5.1
-      SOURCE_COMMIT: dfb494dfe83cead7c84cffc0683def025d4662ee
+      SOURCE_COMMIT: 6ff9c63613e492ad7eaf8b39e1db66697cb2cc12
       GH_REPO: ${{ github.repository }}
     defaults:
       run:
@@ -28,7 +28,7 @@ jobs:
       - name: Check out reviewed source
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: dfb494dfe83cead7c84cffc0683def025d4662ee
+          ref: 6ff9c63613e492ad7eaf8b39e1db66697cb2cc12
           persist-credentials: false
 
       - name: Build Windows executables
@@ -90,7 +90,7 @@ jobs:
 
           本包由 GitHub Actions 从下方源码提交编译，维护回归检查通过后发布。附件提供 ZIP 的 SHA-256 校验文件，包内另附各 EXE 的校验值。发布包不含个人截图、历史记录或清理备份。
 
-          源码提交：`dfb494dfe83cead7c84cffc0683def025d4662ee`。
+          源码提交：`6ff9c63613e492ad7eaf8b39e1db66697cb2cc12`。
           '@
           Set-Content release-notes.md -Value $notes -Encoding utf8
           $raw = gh release view $env:RELEASE_TAG --json databaseId,isDraft,targetCommitish 2>$null
