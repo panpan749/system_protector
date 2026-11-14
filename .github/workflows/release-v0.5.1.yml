@@ -1,0 +1,126 @@
+name: Release v0.5.1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [.github/workflows/release-v0.5.1.yml]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-v0.5.1
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-2022
+    timeout-minutes: 15
+    env:
+      RELEASE_TAG: v0.5.1
+      SOURCE_COMMIT: dfb494dfe83cead7c84cffc0683def025d4662ee
+      GH_REPO: ${{ github.repository }}
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Check out reviewed source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: dfb494dfe83cead7c84cffc0683def025d4662ee
+          persist-credentials: false
+
+      - name: Build Windows executables
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ((git rev-parse HEAD) -ne $env:SOURCE_COMMIT) { throw 'Unexpected source commit.' }
+          .\build.ps1
+          if ((Get-Item .\dist\PopupGuard.exe).VersionInfo.FileVersion -ne '0.5.1.0') { throw 'Unexpected binary version.' }
+
+      - name: Run maintenance regression tests
+        timeout-minutes: 3
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $test = Start-Process -FilePath .\dist\PopupGuard.MaintenanceTests.exe -WindowStyle Hidden -Wait -PassThru -RedirectStandardOutput maintenance-tests.log -RedirectStandardError maintenance-tests-error.log
+          Get-Content maintenance-tests.log
+          Get-Content maintenance-tests-error.log
+          if ($test.ExitCode -ne 0) { throw "Maintenance tests failed: $($test.ExitCode)" }
+
+      - name: Package and verify archive
+        run: |
+          $ErrorActionPreference = 'Stop'
+          .\package.ps1
+          $zipPath = Resolve-Path .\release\PopupGuard-v0.5.1-win-x64.zip
+          $prefix = 'PopupGuard-v0.5.1-win-x64/'
+          $allowed = @('PopupGuard.exe','PopupGuard.Capture.exe','PopupGuard.Demo.exe','README.md','RESEARCH.md','PRESET_RULES.md','SOFTWARE_MAINTENANCE.md','使用说明.txt','SHA256SUMS.txt','data/presets.json','data/software-rules.json') | ForEach-Object { $prefix + $_ }
+          $archive = [IO.Compression.ZipFile]::OpenRead($zipPath)
+          try {
+            $entries = @($archive.Entries | Where-Object Name | ForEach-Object { $_.FullName.Replace('\','/') })
+            if ($entries.Count -ne $allowed.Count -or @(Compare-Object $allowed $entries).Count) { throw 'Unexpected package contents.' }
+          } finally { $archive.Dispose() }
+          $hash = (Get-FileHash $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
+          Set-Content -LiteralPath "$zipPath.sha256" -Value "$hash  PopupGuard-v0.5.1-win-x64.zip" -Encoding ascii
+          "Archive SHA256: $hash" >> $env:GITHUB_STEP_SUMMARY
+
+      - name: Publish release with verified assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $notes = @'
+          Windows 桌面弹窗守护程序，常驻托盘运行。
+
+          ### 下载与运行
+
+          下载 **PopupGuard-v0.5.1-win-x64.zip**，完整解压到可写目录，双击 **PopupGuard.exe**。这是便携版，无需安装。
+
+          - Windows 10 1903 或更新版本 / Windows 11，x64，.NET Framework 4.8。
+          - 保持 `PopupGuard.Capture.exe` 与主程序在同一目录，窗口截图依赖此组件。
+          - 按 **Ctrl + ↓** 点选广告，双击托盘图标打开面板。
+          - `PopupGuard.Demo.exe` 是可选的无害测试弹窗。
+          - 升级时先从托盘退出旧版，覆盖程序文件并保留原有 `data` 目录中的个人配置和记录。移动运行目录后，需重新保存自启动和每日巡检设置。
+
+          ### 本版更新
+
+          - 修复重启后清理状态不刷新：启用后台检查且有待复查项目时，启动后立即复查，巡检页显示结果更新时间。
+          - 区分安装登记残留和等待重启；复查未检出的项目保留在清理记录中。
+          - 包含侧栏界面、历史搜索、可关闭的交互动效，以及优先采集弹窗首帧的截图组件。
+          - 支持预置广告规则、点选确认黑白名单、历史截图核对、增量软件名单及每日扫描。卸载清理仍需用户确认。
+
+          本包由 GitHub Actions 从下方源码提交编译，维护回归检查通过后发布。附件提供 ZIP 的 SHA-256 校验文件，包内另附各 EXE 的校验值。发布包不含个人截图、历史记录或清理备份。
+
+          源码提交：`dfb494dfe83cead7c84cffc0683def025d4662ee`。
+          '@
+          Set-Content release-notes.md -Value $notes -Encoding utf8
+          $raw = gh release view $env:RELEASE_TAG --json databaseId,isDraft,targetCommitish 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            $existing = $raw | ConvertFrom-Json
+            if (-not $existing.isDraft -or $existing.targetCommitish -ne $env:SOURCE_COMMIT) { throw 'Release already published or targets another commit.' }
+          } else {
+            gh release create $env:RELEASE_TAG --target $env:SOURCE_COMMIT --draft --title '弹窗卫士 PopupGuard v0.5.1' --notes-file release-notes.md
+            if ($LASTEXITCODE -ne 0) { throw 'Could not create draft release.' }
+          }
+          $raw = gh release view $env:RELEASE_TAG --json databaseId
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot read release ID.' }
+          $releaseId = ($raw | ConvertFrom-Json).databaseId
+          foreach ($path in @('release/PopupGuard-v0.5.1-win-x64.zip','release/PopupGuard-v0.5.1-win-x64.zip.sha256')) {
+            $file = Get-Item $path
+            $digest = 'sha256:' + (Get-FileHash $path -Algorithm SHA256).Hash.ToLowerInvariant()
+            $raw = gh api "repos/$env:GH_REPO/releases/$releaseId/assets"
+            if ($LASTEXITCODE -ne 0) { throw 'Cannot read assets.' }
+            $assets = @($raw | ConvertFrom-Json)
+            if (-not @($assets | Where-Object name -eq $file.Name).Count) {
+              gh release upload $env:RELEASE_TAG $path
+              if ($LASTEXITCODE -ne 0) { throw 'Asset upload failed.' }
+            }
+            $raw = gh api "repos/$env:GH_REPO/releases/$releaseId/assets"
+            if ($LASTEXITCODE -ne 0) { throw 'Cannot verify assets.' }
+            $asset = @(($raw | ConvertFrom-Json) | Where-Object name -eq $file.Name)
+            if ($asset.Count -ne 1 -or $asset[0].state -ne 'uploaded' -or $asset[0].size -ne $file.Length -or $asset[0].digest -ne $digest) { throw "Asset verification failed: $($file.Name)" }
+          }
+          gh release edit $env:RELEASE_TAG --draft=false --latest --notes-file release-notes.md
+          if ($LASTEXITCODE -ne 0) { throw 'Publication failed.' }
+          gh release view $env:RELEASE_TAG --json url,publishedAt,assets
+          if ($LASTEXITCODE -ne 0) { throw 'Publication verification failed.' }
+
